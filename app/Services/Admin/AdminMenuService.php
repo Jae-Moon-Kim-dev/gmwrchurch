@@ -22,11 +22,15 @@ class AdminMenuService {
         $this->logger->info('===getMenuList Start===');
         $menus = $this->adminMenuRepository->getMenuList();
 
-        $this->getRecursiveMenu($menus);
-
         $this->logger->info('===getMenuList End===');
 
-        return $menus;
+        return $this->getRecursiveMenu($menus);
+    }
+
+    public function getMenuById($id) {
+        $this->logger->info('===getMenuById===');
+
+        return $this->adminMenuRepository->getMenuById($id);
     }
 
     private function getRecursiveMenu($menus) {
@@ -41,8 +45,12 @@ class AdminMenuService {
             $children = [];
             foreach ( $tempMenus as $menu ) {
                 if ( $menu->parent_menu_id == $parent_id ) {
-                    $menu->children = getChildren($menu->menu_id, $tempMenus);
-                    $children[] = $menu;
+                    $treeMenu = array(
+                        "id"=>$menu->menu_id,
+                        "label"=>$menu->menu_name,
+                        "children"=>getChildren($menu->menu_id, $tempMenus),
+                    );
+                    $children[] = (object)$treeMenu;
                 }
             }
             return $children;
@@ -51,11 +59,17 @@ class AdminMenuService {
         $treeMenus = [];
         foreach ( $tempMenus as $menu ) {
             if ( empty($menu->parent_menu_id) ) {
-                $menu->children = getChildren($menu->menu_id, $tempMenus);
-                $treeMenus[] = $menu;
+                $treeMenu = array(
+                    "id"=>$menu->menu_id,
+                    "label"=>$menu->menu_name,
+                    "children"=>getChildren($menu->menu_id, $tempMenus),
+                );
+                $treeMenus[] = (object)$treeMenu;
             }
         }
         $this->logger->info('===getRecursiveMenu End===');
+
+        return $treeMenus;
 
         // $jsonTree = json_encode($treeMenus, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         // $this->logger->info('===getRecursiveMenu==='.$jsonTree);
