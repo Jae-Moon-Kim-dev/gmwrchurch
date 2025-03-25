@@ -55,11 +55,14 @@ class AdminMenuRepository {
     public function getMenuById ($id) {
         $this->logger->info('===getMenuById===');
         $menu = collect(DB::select(
-            'with recursive cte_menu(menu_id, menu_name, parent_menu_id, menu_order, depths, path_id, paths ) as (
+            'with recursive cte_menu(menu_id, menu_name, parent_menu_id, menu_type, menu_url, menu_order, visible_yn, depths, path_id, paths ) as (
                 select menu_id
                     , menu_name
                     , parent_menu_id
+                    , menu_type
+                    , menu_url
                     , menu_order
+                    , visible_yn
                     , 0
                     , cast(lpad(menu_id, 4, "0") as varchar(200))
                     , cast(menu_name as varchar(200))
@@ -69,7 +72,10 @@ class AdminMenuRepository {
                 select a.menu_id
                     , a.menu_name
                     , a.parent_menu_id
+                    , a.menu_type
+                    , a.menu_url
                     , a.menu_order
+                    , a.visible_yn
                     , b.depths + 1
                     , concat(lpad(b.path_id, 4, "0"), " > ", lpad(a.menu_id, 4, "0"))
                     , concat(b.paths, " > ", a.menu_name)
@@ -79,7 +85,10 @@ class AdminMenuRepository {
             select menu_id
                 , menu_name
                 , parent_menu_id
+                , menu_type
+                , menu_url
                 , menu_order
+                , visible_yn
                 , depths
                 , path_id
                 , paths
