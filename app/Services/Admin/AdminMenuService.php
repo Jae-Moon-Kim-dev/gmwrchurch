@@ -33,6 +33,12 @@ class AdminMenuService {
         return $this->adminMenuRepository->getMenuById($id);
     }
 
+    public function update($request, $id) {
+        $this->logger->info('===update===');
+
+        $this->adminMenuRepository->update($request, $id);
+    }
+
     private function getRecursiveMenu($menus) {
         $this->logger->info('===getRecursiveMenu Start===');
         $tempMenus = [];

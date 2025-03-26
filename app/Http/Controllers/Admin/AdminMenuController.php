@@ -41,7 +41,10 @@ class AdminMenuController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->logger->info('===store===');
+        $menus = $request->collect();
+
+        $this->logger->info('===store==='.print_r(json_decode($menus), true));
     }
 
     /**
@@ -64,7 +67,13 @@ class AdminMenuController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $this->logger->info('===update===');
+        $menus = $request->collect();
+
+        $this->logger->info('===update==='.print_r(json_decode($menus), true));
+        $this->logger->info('===update===id => '.$id);
+
+        $this->adminMenuService->update($request, $id);
     }
 
     /**

@@ -98,4 +98,13 @@ class AdminMenuRepository {
     
             return $menu;
     }
+
+    public function update( $request, $id ) {
+        DB::update('
+            update wr_menu set
+                menu_name= :menu_name, 
+                menu_url= :menu_url 
+            where menu_id = :menu_id
+        ', ["menu_name"=> $request->input('menu_name'), "menu_url"=> $request->input('menu_url'), "menu_id"=> $id]);
+    }
 }
