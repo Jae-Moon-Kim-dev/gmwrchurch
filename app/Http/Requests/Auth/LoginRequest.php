@@ -28,7 +28,15 @@ class LoginRequest extends FormRequest
     {
         return [
             'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:8'],
+        ];
+    }
+
+    public function messages() {
+        return [
+            'email.required' => '이메일은 필수 입력값 입니다.',
+            'email.password' => '패스워드는 필수 입력값 입니다.',
+            'password.min' => '비밀번호는 최소 8자 이상이어야 합니다.'
         ];
     }
 

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -13,7 +15,7 @@ class AuthController extends Controller
 
     }
 
-    public function register(Request $request)
+    public function register(LoginRequest $request)
     {
         // $this->validate($request, [
         //     'name' => 'required|min:4',
@@ -34,10 +36,16 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // $this->validate($request, [
-        //     'email'=> 'required|email',
-        //     'password'=> 'required|min:8',
-        // ]);
+        //유효성 검사
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string',
+            'password' => 'required|string|min:8'
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         $data = [
             'email'=>$request->email,
@@ -46,10 +54,13 @@ class AuthController extends Controller
 
         if (auth()->attempt($data))
         {
-            $token = auth()->user()->createToken('token-name')->plainTextToken;
-            return response()->json(['token'=>$token], 200);
+            $createToken = auth()->user()->createToken('gmwoori')->plainTextToken;
+            $splitToken = explode("|", $createToken);
+            $token = $splitToken[1];
+            return response()->json(['success'=>true, 'data'=>$token], 200);
+            
         } else {
-            return response()->json(['error'=>'Unauthorised'], 401);
+            return response()->json(['success'=>false, 'message'=>'Unauthorised'], 401);
         }
     }
 
