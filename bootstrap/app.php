@@ -28,6 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
             SubstituteBindings::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            'api/v1/login',
+            'api/v1/register',
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -93,8 +93,7 @@ class AdminMenuRepository {
                 , path_id
                 , paths
             from cte_menu
-           where menu_id = :menu_id
-            order by path_id', ["menu_id"=>$id]))->first();
+           where menu_id = :menu_id', ["menu_id"=>$id]))->first();
     
             return $menu;
     }

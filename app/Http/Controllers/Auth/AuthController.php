@@ -1,18 +1,27 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Services\Auth\AuthService;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
-class AuthController extends Controller
-{
-    public function __construct()
+class AuthController extends Controller {
+    protected $authService;
+    protected $logger;
+
+    public function __construct(AuthService $authService)
     {
+        $this->authService = $authService;
 
+        $this->logger = new Logger(__CLASS__);
+        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel_'. date("Y-m-d") .'.log'), Logger::INFO));
     }
 
     public function register(LoginRequest $request)
@@ -54,27 +63,26 @@ class AuthController extends Controller
 
         if (auth()->attempt($data))
         {
-            $createToken = auth()->user()->createToken('gmwoori')->plainTextToken;
-            $splitToken = explode("|", $createToken);
-            $token = $splitToken[1];
-            return response()->json(['success'=>true, 'data'=>$token], 200);
+            // $token = auth()->user()->createToken('gmwoori')->plainTextToken;
+
+            // $user = $this->authService->getUserById($request->email);
+
+            // return response()->json(['success'=>true, 'data'=>$user], 200)->cookie('gmwoori', $token, 60*24, '/', null, true, true);
+            $request->session()->regenerate();
+            return response()->json(['success'=>true, 'data'=>auth()->user()]);
             
         } else {
-            return response()->json(['success'=>false, 'message'=>'Unauthorised'], 401);
+            return response()->json(['success'=>false, 'message'=>'비밀번호가 일치하지 않습니다. 비밀번호를 확인해 주세요.'], 200);
         }
     }
 
     public function logout(Request $request)
     {
-        $result = $request->user()->currentAccessToken()->delete();
+        auth()->guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        if($result) {
-            $response = response()->json(['error'=>false,'message'=>'User logout successfully.'], 200);
-        } else {
-            $response = response()->json(['error'=>true,'message'=>'Something is wrong.'], 401);
-        }
-
-        return $response;
+        return response()->json(['success'=>true,'message'=>'정상적으로 로그아웃 되었습니다.'], 200);;
     }
 
 
