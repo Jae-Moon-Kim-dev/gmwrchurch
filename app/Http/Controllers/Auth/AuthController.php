@@ -138,7 +138,8 @@ class AuthController extends Controller {
     {
         JWTAuth::invalidate(JWTAuth::getToken());
 
-        return response()->json(['success'=>true,'message'=>'정상적으로 로그아웃 되었습니다.'], 200);;
+        return response()->json(['success'=>true,'message'=>'정상적으로 로그아웃 되었습니다.'], 200)->cookie('gmwr_token', '', -1)
+                                                                                                 ->cookie('gmwr_refreshToken', '', -1);
     }
 
 
