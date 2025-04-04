@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Services\Auth\AuthService;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller {
     protected $authService;
@@ -38,49 +40,103 @@ class AuthController extends Controller {
             'password'=> bcrypt($request->password),
         ]);
 
-        $token = $user->createToken('token-name')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
-        return response()->json(['token'=>$token], 200);
+        return response()->json(['token'=>$token], 201);
     }
 
     public function login(Request $request)
     {
-        //유효성 검사
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string',
-            'password' => 'required|string|min:8'
-        ]);
+        try {
+            //유효성 검사
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|string',
+                'password' => 'required|string|min:8'
+            ]);
 
-        if($validator->fails())
-        {
-            return response()->json(['errors' => $validator->errors()], 422);
+            if($validator->fails())
+            {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $data = [
+                'email'=>$request->email,
+                'password'=>$request->password,
+            ];
+
+            if(!$token = JWTAuth::attempt($data))
+            {
+                return response()->json(['errors' => 'Invalid credentials'], 401);
+            }
+
+            $refreshToken = JWTAuth::claims(['type'=>'refresh'])->fromUser(auth()->user());
+
+
+            return response()->json(['message'=>'Logged in'])->cookie('gmwr_token', $token, 15, '/', null, true, true)
+                                                             ->cookie('gmwr_refreshToken', $token, 43200, '/', null, true, true);
+        } catch ( JWTException $e ) {
+            return reseponse()->json(['error'=>'Could not create token'], 500);
         }
 
-        $data = [
-            'email'=>$request->email,
-            'password'=>$request->password,
-        ];
+        // if (auth()->attempt($data))
+        // {
+        //     // $token = auth()->user()->createToken('gmwoori')->plainTextToken;
 
-        if (auth()->attempt($data))
-        {
-            // $token = auth()->user()->createToken('gmwoori')->plainTextToken;
+        //     // $user = $this->authService->getUserById($request->email);
 
-            // $user = $this->authService->getUserById($request->email);
-
-            // return response()->json(['success'=>true, 'data'=>$user], 200)->cookie('gmwoori', $token, 60*24, '/', null, true, true);
-            $request->session()->regenerate();
-            return response()->json(['success'=>true, 'data'=>auth()->user()]);
+        //     // return response()->json(['success'=>true, 'data'=>$user], 200)->cookie('gmwoori', $token, 60*24, '/', null, true, true);
+        //     $request->session()->regenerate();
+        //     return response()->json(['success'=>true, 'data'=>auth()->user()]);
             
-        } else {
-            return response()->json(['success'=>false, 'message'=>'비밀번호가 일치하지 않습니다. 비밀번호를 확인해 주세요.'], 200);
+        // } else {
+        //     return response()->json(['success'=>false, 'message'=>'비밀번호가 일치하지 않습니다. 비밀번호를 확인해 주세요.'], 200);
+        // }
+    }
+
+    public function refresh(Request $request)
+    {
+        $refreshToken = $request->cookie('gmwr_refreshToken');
+
+        if ( !$refreshToken ) {
+            return response()->json(['error'=>'No refresh token'], 401);
+        }
+
+        try {
+            JWTAuth::setToken($refreshToken);
+            $user = JWTAuth::authenticate();
+
+            $payload = JWTAuth::getPayload();
+            if ( $payload['type'] !== 'refresh' ) {
+                return response()->json(['error'=>'Invalid refresh token type'], 403);
+            }
+
+            $newAccessToken = JWTAuth::fromUser($user);
+
+            return resonse()->json(['message'=>'Token refreshed'], 200)->cookie('gmwr_token', $newAccessToken, 15, '/', null, true, true);
+        } catch ( JWTException $e ) {
+            return response()->json(['error'=>'Token invalid'], 401);
         }
     }
 
-    public function logout(Request $request)
+    public function getUser(Request $request)
     {
-        auth()->guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        try {
+            $user = $request->get("auth_user");
+
+            if ( !$user ) {
+                return response()->json(['error'=>'User not found'], 404);
+            }
+
+        } catch (JWTException $e) {
+            return response()->json(['error'=>'Invalid token'], 400);
+        }
+
+        return reseponse()->json(compact('user'));
+    }
+
+    public function logout()
+    {
+        JWTAuth::invalidate(JWTAuth::getToken());
 
         return response()->json(['success'=>true,'message'=>'정상적으로 로그아웃 되었습니다.'], 200);;
     }

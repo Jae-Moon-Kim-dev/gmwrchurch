@@ -8,6 +8,7 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Illuminate\Routing\Middleware\ThrottleRequests;
+use App\Http\Middleware\JwtMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -27,6 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle:api',
             SubstituteBindings::class,
         ]);
+
+        $middleware->append(JwtMiddleware::class);
 
         $middleware->validateCsrfTokens(except: [
             'api/v1/login',
