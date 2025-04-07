@@ -6,9 +6,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
-use Illuminate\Routing\Middleware\ThrottleRequests;
 use App\Http\Middleware\JwtMiddleware;
+use Illuminate\Http\Middleware\HandleCors;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -24,17 +23,23 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->group('api', [
-            EnsureFrontendRequestsAreStateful::class,
+            // EnsureFrontendRequestsAreStateful::class,
+            HandleCors::class,
             'throttle:api',
             SubstituteBindings::class,
         ]);
 
         $middleware->append(JwtMiddleware::class);
 
-        $middleware->validateCsrfTokens(except: [
-            'api/v1/login',
-            'api/v1/register',
+        $middleware->encryptCookies(except: [
+            'gmwr_token',
+            'gmwr_refreshToken',
         ]);
+
+        // $middleware->validateCsrfTokens(except: [
+        //     'api/v1/login',
+        //     'api/v1/register',
+        // ]);
 
     })
     ->withExceptions(function (Exceptions $exceptions) {

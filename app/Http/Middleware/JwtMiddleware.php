@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class JwtMiddleware
 {
@@ -17,18 +18,27 @@ class JwtMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $except = [
+            'api/v1/login',
+            'api/v1/register',
+            'api/v1/refreshToken',
+        ];
+    
+        if (in_array($request->path(), $except)) {
+            return $next($request);
+        }
 
         try {
             $token = $request->cookie('gmwr_token');
 
-            if ( !$token ) {
-                return response()->json(['error'=>'Token not found'], 401);
+            if (!$token) {
+                return response()->json(['success'=>false, 'code'=> 'T-002', 'message' => 'access token expired'], 401);
             }
 
             $user = JWTAuth::setToken($token)->authenticate();
             $request->merge(['auth_user'=>$user]);
         } catch ( JWTException $e ) {
-            return response()->json(['error'=>'Token not valid'], 401);
+            return response()->json(['success'=> false, 'code'=>'T-001', 'message'=>'Token not valid'], 401);
         }
 
         return $next($request);

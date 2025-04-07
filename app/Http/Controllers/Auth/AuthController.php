@@ -42,7 +42,7 @@ class AuthController extends Controller {
 
         $token = JWTAuth::fromUser($user);
 
-        return response()->json(['token'=>$token], 201);
+        return response()->json(['success', true, 'message'=> '사용자 등록 완료'], 201);
     }
 
     public function login(Request $request)
@@ -56,7 +56,7 @@ class AuthController extends Controller {
 
             if($validator->fails())
             {
-                return response()->json(['errors' => $validator->errors()], 422);
+                return response()->json(['success'=> false, 'message' => '비밀번호가 일치하지 않습니다. 비밀번호를 확인해 주세요.'], 422);
             }
 
             $data = [
@@ -66,16 +66,15 @@ class AuthController extends Controller {
 
             if(!$token = JWTAuth::attempt($data))
             {
-                return response()->json(['errors' => 'Invalid credentials'], 401);
+                return response()->json(['success'=>false, 'code'=> 'T-005', 'message' => 'Invalid credentials'], 401);
             }
 
-            $refreshToken = JWTAuth::claims(['type'=>'refresh'])->fromUser(auth()->user());
+            $refreshToken = JWTAuth::claims(['type'=>'refresh'])->fromUser(Auth::user());
 
-
-            return response()->json(['message'=>'Logged in'])->cookie('gmwr_token', $token, 15, '/', null, true, true)
-                                                             ->cookie('gmwr_refreshToken', $token, 43200, '/', null, true, true);
+            return response()->json(['success'=>true])->cookie('gmwr_token', $token, 15, '/', null, false, true)
+                                                             ->cookie('gmwr_refreshToken', $refreshToken, 43200, '/', null, false, true);
         } catch ( JWTException $e ) {
-            return reseponse()->json(['error'=>'Could not create token'], 500);
+            return response()->json(['success'=>false, 'message'=>'Could not create token'], 500);
         }
 
         // if (auth()->attempt($data))
@@ -98,7 +97,7 @@ class AuthController extends Controller {
         $refreshToken = $request->cookie('gmwr_refreshToken');
 
         if ( !$refreshToken ) {
-            return response()->json(['error'=>'No refresh token'], 401);
+            return response()->json(['success'=> false, 'code'=> 'T-004', 'message'=>'No refresh token'], 401);
         }
 
         try {
@@ -107,14 +106,14 @@ class AuthController extends Controller {
 
             $payload = JWTAuth::getPayload();
             if ( $payload['type'] !== 'refresh' ) {
-                return response()->json(['error'=>'Invalid refresh token type'], 403);
+                return response()->json(['success'=> false, 'code'=>'T-001', 'message'=>'Invalid refresh token type'], 403);
             }
 
             $newAccessToken = JWTAuth::fromUser($user);
 
-            return resonse()->json(['message'=>'Token refreshed'], 200)->cookie('gmwr_token', $newAccessToken, 15, '/', null, true, true);
+            return response()->json(['success'=>true, 'message'=>'Token refreshed'], 200)->cookie('gmwr_token', $newAccessToken, 15, '/', null, false, true);
         } catch ( JWTException $e ) {
-            return response()->json(['error'=>'Token invalid'], 401);
+            return response()->json(['success'=>false, 'code'=>'T-001', 'message'=>'Token invalid'], 401);
         }
     }
 
@@ -124,14 +123,14 @@ class AuthController extends Controller {
             $user = $request->get("auth_user");
 
             if ( !$user ) {
-                return response()->json(['error'=>'User not found'], 404);
+                return response()->json(['success'=>false, 'code'=>'T-005', 'message'=>'User not found'], 404);
             }
 
         } catch (JWTException $e) {
-            return response()->json(['error'=>'Invalid token'], 400);
+            return response()->json(['success'=>false, 'code'=>'T-001', 'message'=>'Invalid token'], 400);
         }
 
-        return reseponse()->json(compact('user'));
+        return response()->json(['success'=>true,'data'=>$user]);
     }
 
     public function logout()
