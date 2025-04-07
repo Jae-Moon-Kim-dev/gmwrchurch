@@ -13,6 +13,7 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class AuthController extends Controller {
     protected $authService;
@@ -23,7 +24,7 @@ class AuthController extends Controller {
         $this->authService = $authService;
 
         $this->logger = new Logger(__CLASS__);
-        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel_'. date("Y-m-d") .'.log'), Logger::INFO));
+        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel_'. date("Y-m-d") .'.log')));
     }
 
     public function register(LoginRequest $request)
@@ -47,6 +48,8 @@ class AuthController extends Controller {
 
     public function login(Request $request)
     {
+        $secure = app()->environment('production');
+
         try {
             //유효성 검사
             $validator = Validator::make($request->all(), [
@@ -71,29 +74,17 @@ class AuthController extends Controller {
 
             $refreshToken = JWTAuth::claims(['type'=>'refresh'])->fromUser(Auth::user());
 
-            return response()->json(['success'=>true])->cookie('gmwr_token', $token, 15, '/', null, false, true)
-                                                             ->cookie('gmwr_refreshToken', $refreshToken, 43200, '/', null, false, true);
+            return response()->json(['success'=>true])->cookie('gmwr_token', $token, 15, '/', null, $secure, true)
+                                                             ->cookie('gmwr_refreshToken', $refreshToken, 43200, '/', null, $secure, true);
         } catch ( JWTException $e ) {
             return response()->json(['success'=>false, 'message'=>'Could not create token'], 500);
         }
-
-        // if (auth()->attempt($data))
-        // {
-        //     // $token = auth()->user()->createToken('gmwoori')->plainTextToken;
-
-        //     // $user = $this->authService->getUserById($request->email);
-
-        //     // return response()->json(['success'=>true, 'data'=>$user], 200)->cookie('gmwoori', $token, 60*24, '/', null, true, true);
-        //     $request->session()->regenerate();
-        //     return response()->json(['success'=>true, 'data'=>auth()->user()]);
-            
-        // } else {
-        //     return response()->json(['success'=>false, 'message'=>'비밀번호가 일치하지 않습니다. 비밀번호를 확인해 주세요.'], 200);
-        // }
     }
 
     public function refresh(Request $request)
     {
+        $secure = app()->environment('production');
+
         $refreshToken = $request->cookie('gmwr_refreshToken');
 
         if ( !$refreshToken ) {
@@ -111,7 +102,9 @@ class AuthController extends Controller {
 
             $newAccessToken = JWTAuth::fromUser($user);
 
-            return response()->json(['success'=>true, 'message'=>'Token refreshed'], 200)->cookie('gmwr_token', $newAccessToken, 15, '/', null, false, true);
+            return response()->json(['success'=>true, 'message'=>'Token refreshed'], 200)->cookie('gmwr_token', $newAccessToken, 15, '/', null, $secure, true);
+        } catch (TokenExpiredException $e) {
+            return response()->json(['success'=>false, 'code'=>'T-003'], 401);
         } catch ( JWTException $e ) {
             return response()->json(['success'=>false, 'code'=>'T-001', 'message'=>'Token invalid'], 401);
         }

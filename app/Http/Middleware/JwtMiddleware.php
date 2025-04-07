@@ -37,6 +37,16 @@ class JwtMiddleware
 
             $user = JWTAuth::setToken($token)->authenticate();
             $request->merge(['auth_user'=>$user]);
+        } catch ( TokenExpiredException $e ) {
+            // access token 만료 → refresh 시도
+            $refreshToken = $request->cookie('gmwr_refreshToken');
+
+            if (!$refreshToken) {
+                return response()->json(['success'=> false, 'code'=>'T-004', 'message' => 'not refresh token'], 401);
+            }
+
+            return response()->json(['success'=>false, 'code'=> 'T-002', 'message' => 'access token expired'], 401);
+
         } catch ( JWTException $e ) {
             return response()->json(['success'=> false, 'code'=>'T-001', 'message'=>'Token not valid'], 401);
         }

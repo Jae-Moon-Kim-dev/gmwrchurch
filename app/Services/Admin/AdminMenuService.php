@@ -53,6 +53,7 @@ class AdminMenuService {
                 if ( $menu->parent_menu_id == $parent_id ) {
                     $treeMenu = array(
                         "id"=>$menu->menu_id,
+                        "parentId"=>$menu->parent_menu_id,
                         "label"=>$menu->menu_name,
                         "children"=>getChildren($menu->menu_id, $tempMenus),
                     );
@@ -67,6 +68,7 @@ class AdminMenuService {
             if ( empty($menu->parent_menu_id) ) {
                 $treeMenu = array(
                     "id"=>$menu->menu_id,
+                    "parentId"=>$menu->parent_menu_id,
                     "label"=>$menu->menu_name,
                     "children"=>getChildren($menu->menu_id, $tempMenus),
                 );
