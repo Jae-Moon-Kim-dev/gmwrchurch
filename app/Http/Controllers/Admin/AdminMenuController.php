@@ -17,7 +17,7 @@ class AdminMenuController extends Controller
         $this->adminMenuService = $adminMenuService;
 
         $this->logger = new Logger(__CLASS__);
-        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel.log'), Logger::INFO));
+        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel_'. date("Y-m-d") .'.log')));
     }
 
     /**
@@ -44,7 +44,7 @@ class AdminMenuController extends Controller
         $this->logger->info('===store===');
         $menus = $request->collect();
 
-        $this->logger->info('===store==='.print_r(json_decode($menus), true));
+        $this->adminMenuService->store($menus);
     }
 
     /**
@@ -70,7 +70,7 @@ class AdminMenuController extends Controller
         $this->logger->info('===update===');
         $menus = $request->collect();
 
-        $this->logger->info('===update==='.print_r(json_decode($menus), true));
+        $this->logger->info('===update==='.print_r(json_decode($menus, true)));
         $this->logger->info('===update===id => '.$id);
 
         $this->adminMenuService->update($request, $id);
@@ -81,6 +81,9 @@ class AdminMenuController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $this->logger->info('===destroy===');
+        $this->logger->info('===destroy===id => '.$id);
+
+        $this->adminMenuService->destroy($id);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Admin;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -12,7 +13,7 @@ class AdminMenuRepository {
 
     public function __construct() {
         $this->logger = new Logger(__CLASS__);
-        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel.log'), Logger::INFO));
+        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel_'. date("Y-m-d") .'.log')));
     }
 
     public function getMenuList () {
@@ -98,6 +99,38 @@ class AdminMenuRepository {
             return $menu;
     }
 
+    public function store( $menu ) {
+        DB::insert('
+            insert into wr_menu (
+                parent_menu_id, 
+                menu_name,
+                menu_url, 
+                visible_yn,
+                menu_order,
+                mem_id,
+                create_date,
+                modified_date
+            ) values (
+                :parent_menu_id,
+                :menu_name,
+                :menu_url,
+                :visible_yn,
+                (select max(a.menu_order)+1
+                   from wr_menu a
+                  where a.parent_menu_id is null),
+                :mem_id,
+                now(),
+                now()
+            )
+        ', [
+            "parent_menu_id"=> ( empty($menu->get('parent_menu_id')) ? null : $menu->get('parent_menu_id') ), 
+            "menu_name"=> $menu->get('menu_name'), 
+            "menu_url"=> $menu->get('menu_url'), 
+            "visible_yn"=> $menu->get('visible_yn'),
+            "mem_id"=> Auth::user()->id
+           ]);
+    }
+
     public function update( $request, $id ) {
         DB::update('
             update wr_menu set
@@ -105,5 +138,12 @@ class AdminMenuRepository {
                 menu_url= :menu_url 
             where menu_id = :menu_id
         ', ["menu_name"=> $request->input('menu_name'), "menu_url"=> $request->input('menu_url'), "menu_id"=> $id]);
+    }
+
+    public function destroy( $id ) {
+        DB::delete('
+            delete from wr_menu
+            where menu_id = :menu_id
+        ', ["menu_id"=> $id]);
     }
 }

@@ -104,7 +104,7 @@ class AuthController extends Controller {
 
             return response()->json(['success'=>true, 'message'=>'Token refreshed'], 200)->cookie('gmwr_token', $newAccessToken, 15, '/', null, $secure, true);
         } catch (TokenExpiredException $e) {
-            return response()->json(['success'=>false, 'code'=>'T-003'], 401);
+            return response()->json(['success'=>false, 'code'=>'T-003', 'message'=>'Refresh token expired'], 401);
         } catch ( JWTException $e ) {
             return response()->json(['success'=>false, 'code'=>'T-001', 'message'=>'Token invalid'], 401);
         }

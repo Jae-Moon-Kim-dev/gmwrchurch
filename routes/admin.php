@@ -10,4 +10,5 @@ Route::middleware(JwtMiddleware::class)->prefix('admin/menus')->group(function (
     Route::get('/{id}', [AdminMenuController::class, 'show']);
     Route::post('/saveMenu', [AdminMenuController::class, 'store']);
     Route::patch('/saveMenu/{id}', [AdminMenuController::class, 'update']);
+    Route::delete('/deleteMenu/{id}', [AdminMenuController::class, 'destroy']);
 });

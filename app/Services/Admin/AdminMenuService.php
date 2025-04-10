@@ -14,7 +14,7 @@ class AdminMenuService {
         $this->adminMenuRepository = $adminMenuRepository;
 
         $this->logger = new Logger(__CLASS__);
-        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel.log'), Logger::INFO));
+        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel_'. date("Y-m-d") .'.log')));
     }
 
     public function getMenuList() {
@@ -33,10 +33,22 @@ class AdminMenuService {
         return $this->adminMenuRepository->getMenuById($id);
     }
 
+    public function store($menu) {
+        $this->logger->info('===store===');
+        $this->logger->info('===store==='.print_r($menu, true));
+        $this->adminMenuRepository->store($menu);
+    }
+
     public function update($request, $id) {
         $this->logger->info('===update===');
 
         $this->adminMenuRepository->update($request, $id);
+    }
+
+    public function destroy($id) {
+        $this->logger->info('===destroy===');
+
+        $this->adminMenuRepository->destroy($id);
     }
 
     private function getRecursiveMenu($menus) {
