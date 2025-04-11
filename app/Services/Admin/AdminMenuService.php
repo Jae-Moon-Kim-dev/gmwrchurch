@@ -45,6 +45,17 @@ class AdminMenuService {
         $this->adminMenuRepository->update($request, $id);
     }
 
+    public function updateOrder($menus) {
+        $this->logger->info('===updateOrder===');
+
+        foreach ( $menus as $menu ) {
+            $this->adminMenuRepository->updateOrder($menu["id"], $menu["menuOrder"]);
+            foreach ( $menu["children"] as $child ) {
+                $this->adminMenuRepository->updateOrder($child["id"], $child["menuOrder"]);
+            }
+        }
+    }
+
     public function destroy($id) {
         $this->logger->info('===destroy===');
 
@@ -67,6 +78,7 @@ class AdminMenuService {
                         "id"=>$menu->menu_id,
                         "parentId"=>$menu->parent_menu_id,
                         "label"=>$menu->menu_name,
+                        "menuOrder"=>$menu->menu_order,
                         "children"=>getChildren($menu->menu_id, $tempMenus),
                     );
                     $children[] = (object)$treeMenu;
@@ -82,6 +94,7 @@ class AdminMenuService {
                     "id"=>$menu->menu_id,
                     "parentId"=>$menu->parent_menu_id,
                     "label"=>$menu->menu_name,
+                    "menuOrder"=>$menu->menu_order,
                     "children"=>getChildren($menu->menu_id, $tempMenus),
                 );
                 $treeMenus[] = (object)$treeMenu;

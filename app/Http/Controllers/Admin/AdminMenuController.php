@@ -70,10 +70,21 @@ class AdminMenuController extends Controller
         $this->logger->info('===update===');
         $menus = $request->collect();
 
-        $this->logger->info('===update==='.print_r(json_decode($menus, true)));
+        $this->logger->info('===update==='.print_r($menus));
         $this->logger->info('===update===id => '.$id);
 
         $this->adminMenuService->update($request, $id);
+    }
+
+    public function updateOrder(Request $request)
+    {
+        $this->logger->info('===updateOrder===');
+        $menus = $request->collect();
+        $datas = $menus->get("datas");
+
+        $this->adminMenuService->updateOrder($datas);
+
+        $this->logger->info('===updateOrder==='.print_r($menus->get("datas"), true));
     }
 
     /**

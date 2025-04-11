@@ -74,7 +74,9 @@ class AuthController extends Controller {
 
             $refreshToken = JWTAuth::claims(['type'=>'refresh'])->fromUser(Auth::user());
 
-            return response()->json(['success'=>true])->cookie('gmwr_token', $token, 15, '/', null, $secure, true)
+            // return response()->json(['success'=>true])->cookie('gmwr_token', $token, 15, '/', null, $secure, true)
+            //                                                  ->cookie('gmwr_refreshToken', $refreshToken, 43200, '/', null, $secure, true);
+            return response()->json(['success'=>true])->cookie('gmwr_token', $token, 1, '/', null, $secure, true)
                                                              ->cookie('gmwr_refreshToken', $refreshToken, 43200, '/', null, $secure, true);
         } catch ( JWTException $e ) {
             return response()->json(['success'=>false, 'message'=>'Could not create token'], 500);
@@ -102,7 +104,8 @@ class AuthController extends Controller {
 
             $newAccessToken = JWTAuth::fromUser($user);
 
-            return response()->json(['success'=>true, 'message'=>'Token refreshed'], 200)->cookie('gmwr_token', $newAccessToken, 15, '/', null, $secure, true);
+            // return response()->json(['success'=>true, 'message'=>'Token refreshed'], 200)->cookie('gmwr_token', $newAccessToken, 15, '/', null, $secure, true);
+            return response()->json(['success'=>true, 'message'=>'Token refreshed'], 200)->cookie('gmwr_token', $newAccessToken, 1, '/', null, $secure, true);
         } catch (TokenExpiredException $e) {
             return response()->json(['success'=>false, 'code'=>'T-003', 'message'=>'Refresh token expired'], 401);
         } catch ( JWTException $e ) {
