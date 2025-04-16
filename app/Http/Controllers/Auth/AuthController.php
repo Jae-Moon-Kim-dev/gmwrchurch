@@ -14,6 +14,7 @@ use Monolog\Handler\StreamHandler;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller {
     protected $authService;
@@ -37,13 +38,23 @@ class AuthController extends Controller {
 
         $user = User::create([
             'name'=> $request->name,
+            'mem_id'=> $request->mem_id,
+            'gender1'=> $request->gender1,
             'email'=> $request->email,
+            'cel_num'=> $request->cel_num,
+            'birth_date'=> $request->birth_date,
+            'parent_nm'=> $request->parent_nm,
+            'gender2'=> $request->gender2,
+            'parent_birth_date'=> $request->parent_birth_date,
+            'parent_cel_num'=> $request->parent_cel_num,
+            'mem_agr1'=> $request->mem_agr1,
+            'mem_agr2'=> $request->mem_agr2,
             'password'=> bcrypt($request->password),
         ]);
 
         $token = JWTAuth::fromUser($user);
 
-        return response()->json(['success', true, 'message'=> '사용자 등록 완료'], 201);
+        return response()->json(['success'=> true, 'message'=> '사용자 등록 완료'], 201);
     }
 
     public function login(Request $request)
@@ -53,7 +64,7 @@ class AuthController extends Controller {
         try {
             //유효성 검사
             $validator = Validator::make($request->all(), [
-                'email' => 'required|string',
+                'mem_id' => 'required|string',
                 'password' => 'required|string|min:8'
             ]);
 
@@ -63,7 +74,7 @@ class AuthController extends Controller {
             }
 
             $data = [
-                'email'=>$request->email,
+                'mem_id'=>$request->mem_id,
                 'password'=>$request->password,
             ];
 
@@ -127,6 +138,17 @@ class AuthController extends Controller {
         }
 
         return response()->json(['success'=>true,'data'=>$user]);
+    }
+
+    public function idCheck(Request $request) 
+    {
+        $user = User::where('mem_id', $request->mem_id)->first();
+
+        if ( !$user ) {
+            return response()->json(['success'=>true, 'data'=>true, 'message'=>'User not found'], 200);
+        } else {
+            return response()->json(['success'=>true, 'data'=>false, 'message'=>'User exists'], 200);
+        }
     }
 
     public function logout()

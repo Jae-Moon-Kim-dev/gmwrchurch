@@ -19,7 +19,17 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $fillable = [
         'name',
+        'mem_id',
+        'gender1',
         'email',
+        'cel_num',
+        'birth_date',
+        'parent_nm',
+        'gender2',
+        'parent_birth_date',
+        'parent_cel_num',
+        'mem_agr1',
+        'mem_agr2',
         'password',
     ];
 
@@ -41,6 +51,8 @@ class User extends Authenticatable implements JWTSubject
     protected function casts(): array
     {
         return [
+            'birth_date' => 'datetime',
+            'parent_birth_date' => 'datetime',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];

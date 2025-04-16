@@ -22,6 +22,7 @@ class JwtMiddleware
             'api/v1/login',
             'api/v1/register',
             'api/v1/refreshToken',
+            'api/v1/idCheck',
         ];
     
         if (in_array($request->path(), $except)) {
