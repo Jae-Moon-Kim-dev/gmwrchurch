@@ -70,7 +70,7 @@ class AuthController extends Controller {
 
             if($validator->fails())
             {
-                return response()->json(['success'=> false, 'message' => '비밀번호가 일치하지 않습니다. 비밀번호를 확인해 주세요.'], 422);
+                return response()->json(['success'=> false, 'message' => '비밀번호가 일치하지 않습니다. 비밀번호를 확인해 주세요.'], 200);
             }
 
             $data = [
@@ -80,7 +80,7 @@ class AuthController extends Controller {
 
             if(!$token = JWTAuth::attempt($data))
             {
-                return response()->json(['success'=>false, 'code'=> 'T-005', 'message' => 'Invalid credentials'], 401);
+                return response()->json(['success'=>false, 'code'=> 'T-005', 'message' => '비밀번호가 일치하지 않습니다. 비밀번호를 확인해 주세요.'], 401);
             }
 
             $refreshToken = JWTAuth::claims(['type'=>'refresh'])->fromUser(Auth::user());
