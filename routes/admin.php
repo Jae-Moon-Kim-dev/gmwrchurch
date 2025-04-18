@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminMenuController;
+use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Middleware\JwtMiddleware;
 
 Route::middleware(JwtMiddleware::class)->prefix('admin/menus')->group(function (){
@@ -12,4 +13,8 @@ Route::middleware(JwtMiddleware::class)->prefix('admin/menus')->group(function (
     Route::patch('/saveMenu/{id}', [AdminMenuController::class, 'update']);
     Route::post('/updateMenuOrder', [AdminMenuController::class, 'updateOrder']);
     Route::delete('/deleteMenu/{id}', [AdminMenuController::class, 'destroy']);
+});
+
+Route::middleware(JwtMiddleware::class)->prefix('admin/role')->group(function (){
+    Route::get('/', [AdminRoleController::class, 'index']);
 });
