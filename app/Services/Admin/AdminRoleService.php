@@ -23,4 +23,20 @@ class AdminRoleService {
         
         return $this->adminRoleRepository->getRoleList();
     }
+
+    public function store($role) {
+        $this->logger->info('===store Start===');
+
+        $this->adminRoleRepository->store($role);
+    }
+
+    public function update($role, $id) {
+        $this->adminRoleRepository->update($role, $id);
+    }
+
+    public function destroy($id) {
+        $this->logger->info('===destroy Start===');
+
+        $this->adminRoleRepository->destroy($id);
+    }
 }
