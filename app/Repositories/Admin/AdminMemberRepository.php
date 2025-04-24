@@ -44,7 +44,7 @@ class AdminMemberRepository {
         $this->logger->info('===getMemberTotalCount===');
         $cnt = collect(DB::select(
         'select count(*) as total_cnt
-           from users a'))->values()->first();
+           from users a'))->first();
 
         return $cnt;
     }
