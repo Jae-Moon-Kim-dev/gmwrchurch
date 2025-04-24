@@ -23,7 +23,7 @@ class AdminMemberService {
         
         return [
             'member_list'=> $this->adminMemberRepository->getMemberList($member),
-            'total_cnt'=> $this->adminMemberRepository->getMemberTotalCount(),
+            'total_cnt'=> collect($this->adminMemberRepository->getMemberTotalCount())->get('total_cnt'),
         ];
     }
 }

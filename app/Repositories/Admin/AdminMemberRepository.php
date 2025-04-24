@@ -29,12 +29,12 @@ class AdminMemberRepository {
               , (select role_name 
                    from wr_role b 
                   where b.role_id = a.role_id) as role_name
-              , a.created_at 
+              , date_format(a.created_at, "%Y-%m-%d") as created_at
            from users a
           where (@rown:=0) = 0
           limit :page_size offset :page_index', [
             'page_size'=> $member->get('pageSize'),
-            'page_index'=> $member->get('pageIndex')
+            'page_index'=> ($member->get('pageIndex') * $member->get('pageSize'))
           ]);
 
         return $members;
@@ -42,9 +42,9 @@ class AdminMemberRepository {
 
     public function getMemberTotalCount () {
         $this->logger->info('===getMemberTotalCount===');
-        $cnt = DB::select(
+        $cnt = collect(DB::select(
         'select count(*) as total_cnt
-           from users a');
+           from users a'))->first();
 
         return $cnt;
     }
