@@ -23,7 +23,8 @@ class AdminRoleRepository {
               , role_name
               , description
               , edit_yn
-           from wr_role');
+           from wr_role
+          where role_id not in (1 ,2)');
 
         return $roles;
     }

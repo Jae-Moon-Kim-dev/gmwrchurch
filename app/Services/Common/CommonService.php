@@ -50,5 +50,22 @@ class CommonService {
 
         return $commons;
     }
+
+    public function getRoles() {
+        $this->logger->info('===getRoles===');
+
+        $roles = [];
+        $roleCodes = $this->commonRepository->getRoles();
+
+        foreach( $roleCodes as $roleCode ) {
+            $role = array(
+                "value"=> $roleCode->role_id,
+                "label"=> $roleCode->role_name,
+            );
+            $roles[] = (object)$role;
+        };
+
+        return $roles;
+    }
     
 }

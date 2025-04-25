@@ -18,8 +18,8 @@ class AdminMemberRepository {
 
     public function getMemberList ( $member ) {
         $this->logger->info('===getMemberList===');
-        $members = DB::select(
-        'select @rown:= @rown+1 as rownum
+        $params = [];
+        $sql = 'select @rown:= @rown+1 as rownum
               , a.id
               , a.name
               , a.mem_id 
@@ -31,20 +31,74 @@ class AdminMemberRepository {
                   where b.role_id = a.role_id) as role_name
               , date_format(a.created_at, "%Y-%m-%d") as created_at
            from users a
-          where (@rown:=0) = 0
-          limit :page_size offset :page_index', [
-            'page_size'=> $member->get('pageSize'),
-            'page_index'=> ($member->get('pageIndex') * $member->get('pageSize'))
-          ]);
+          where (@rown:=0) = 0';
+
+          if ( !empty(((object)$member->get('searchQuery'))->role_id) ) {
+            $sql = $sql.' and role_id = :role_id';
+            $params['role_id'] = ((object)$member->get('searchQuery'))->role_id;
+        }
+        if ( !empty(((object)$member->get('searchQuery'))->searchParam) 
+                && !empty(((object)$member->get('searchQuery'))->searchText) ) {
+            $searchParam = ((object)$member->get('searchQuery'))->searchParam;
+            $searchText = ((object)$member->get('searchQuery'))->searchText;
+            
+            if ( $searchParam == 'name' ) {
+                $sql .= ' and name = :name';
+                $params['name'] = $searchText;
+            } else if ( $searchParam == 'mem_id' ) {
+                $sql .= ' and mem_id like :mem_id';
+                $params['mem_id'] = "%".$searchText."%";
+            } else if ( $searchParam == 'email' ) {
+                $sql .= ' and email = :email';
+                $params['email'] = $searchText;
+            } else if ( $searchParam == 'cel_num' ) {
+                $sql .= ' and cel_num = :cel_num';
+                $params['cel_num'] = $searchText;
+            }
+        }
+
+        $sql .= ' order by a.id desc limit :page_size offset :page_index';
+
+        $params['page_size'] = ((object)$member->get('pagination'))->pageSize;
+        $params['page_index'] = ((object)$member->get('pagination'))->pageSize * ((object)$member->get('pagination'))->pageIndex;
+
+        $members = DB::select($sql, $params);
 
         return $members;
     }
 
-    public function getMemberTotalCount () {
+    public function getMemberTotalCount ($member) {
         $this->logger->info('===getMemberTotalCount===');
-        $cnt = collect(DB::select(
-        'select count(*) as total_cnt
-           from users a'))->first();
+        $params = [];
+        $sql = 'select count(*) as total_cnt
+           from users a
+          where 1=1';
+
+        if ( !empty(((object)$member->get('searchQuery'))->role_id) ) {
+            $sql = $sql.' and role_id = :role_id';
+            $params['role_id'] = ((object)$member->get('searchQuery'))->role_id;
+        }
+        if ( !empty(((object)$member->get('searchQuery'))->searchParam) 
+                && !empty(((object)$member->get('searchQuery'))->searchText) ) {
+            $searchParam = ((object)$member->get('searchQuery'))->searchParam;
+            $searchText = ((object)$member->get('searchQuery'))->searchText;
+            
+            if ( $searchParam == 'name' ) {
+                $sql .= ' and name = :name';
+                $params['name'] = $searchText;
+            } else if ( $searchParam == 'mem_id' ) {
+                $sql .= ' and mem_id like :mem_id';
+                $params['mem_id'] = "%".$searchText."%";
+            } else if ( $searchParam == 'email' ) {
+                $sql .= ' and email = :email';
+                $params['email'] = $searchText;
+            } else if ( $searchParam == 'cel_num' ) {
+                $sql .= ' and cel_num = :cel_num';
+                $params['cel_num'] = $searchText;
+            }
+        }
+
+        $cnt = collect(DB::select($sql, $params))->first();
 
         return $cnt;
     }

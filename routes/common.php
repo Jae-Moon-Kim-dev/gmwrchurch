@@ -8,4 +8,5 @@ use App\Http\Middleware\JwtMiddleware;
 Route::middleware(JwtMiddleware::class)->prefix('common')->group(function (){
     Route::get('/getMenuType', [CommonController::class, 'getMenuType']);
     Route::get('/getCombVisible', [CommonController::class, 'getCombVisible']);
+    Route::get('/getRoles', [CommonController::class, 'getRoles']);
 });

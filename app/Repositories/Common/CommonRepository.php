@@ -45,4 +45,16 @@ class CommonRepository {
 
         return $menuType;
     }
+
+    public function getRoles() {
+        $this->logger->info('===getRoles===');
+
+        $roles = DB::select(
+        'select role_id
+              , role_name
+           from wr_role'
+        );
+
+        return $roles;
+    }
 }

@@ -41,4 +41,15 @@ class CommonController extends Controller
             return response()->json(['success'=>true, 'data'=>$combVisible], 200);
         }
     }
+
+    public function getRoles() {
+        $this->logger->info('===getRoles===');
+        $roles =  $this->commonService->getRoles();
+
+        if ( !$roles ) {
+            return response()->json(['success'=>false, 'message'=>'No Data'], 401);
+        } else {
+            return response()->json(['success'=>true, 'data'=>$roles], 200);
+        }
+    }
 }
