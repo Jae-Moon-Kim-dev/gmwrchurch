@@ -26,4 +26,26 @@ class AdminMemberService {
             'total_cnt'=> $this->adminMemberRepository->getMemberTotalCount($member)->total_cnt,
         ];
     }
+
+    public function updateMemberRole($request) {
+        $this->logger->info('===updateMemberRole===');
+        $memberRoles = $request->get("roleMembers");
+
+        foreach ( $memberRoles as $memberRole ) {
+            $this->logger->info('===updateMemberRole===');
+
+            $this->adminMemberRepository->updateMemberRole((object)$memberRole);
+        }
+    }
+
+    public function deleteMember($request) {
+        $this->logger->info('===deleteMember===');
+        $members = $request->get("deleteMembers");
+
+        foreach ( $members as $member ) {
+            $this->logger->info('===deleteMember===');
+
+            $this->adminMemberRepository->deleteMember((object)$member);
+        }
+    }
 }

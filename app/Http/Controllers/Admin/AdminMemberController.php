@@ -30,4 +30,16 @@ class AdminMemberController extends Controller
             return response()->json(['success'=>true, 'data'=>$members], 200);
         }
     }
+
+    public function updateMemberRole ( Request $request ) {
+        $this->logger->info('===updateMemberRole===');
+
+        $this->adminMemberService->updateMemberRole($request);
+    }
+
+    public function deleteMember ( Request $request ) {
+        $this->logger->info('===deleteMember===');
+
+        $this->adminMemberService->deleteMember($request);
+    }
 }

@@ -102,4 +102,24 @@ class AdminMemberRepository {
 
         return $cnt;
     }
+
+    public function updateMemberRole ($memberRole) {
+        DB::update('
+            update users set
+                   role_id = :role_id
+            where mem_id = :mem_id
+        ',[
+            'role_id'=> $memberRole->role_id,
+            'mem_id'=> $memberRole->mem_id
+        ]);
+    }
+
+    public function deleteMember ( $member ) {
+        DB::delete('
+            delete from users
+             where mem_id = :mem_id
+        ',[
+            'mem_id'=> $member->mem_id
+        ]);
+    }
 }
