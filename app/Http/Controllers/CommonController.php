@@ -17,7 +17,7 @@ class CommonController extends Controller
         $this->commonService = $commonService;
 
         $this->logger = new Logger(__CLASS__);
-        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel.log'), Logger::INFO));
+        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel.log')));
     }
 
     public function getMenuType() {

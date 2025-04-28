@@ -25,4 +25,6 @@ Route::middleware(JwtMiddleware::class)->prefix('admin/role')->group(function ()
 
 Route::middleware(JwtMiddleware::class)->prefix('admin/member')->group(function (){
     Route::post('/', [AdminMemberController::class, 'index']);
+    Route::post('/updateMemberRole', [AdminMemberController::class, 'updateMemberRole']);
+    Route::post('/deleteMember', [AdminMemberController::class, 'deleteMember']);
 });
