@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminMenuController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminMemberController;
+use App\Http\Controllers\Admin\AdminPermissionController;
 use App\Http\Middleware\JwtMiddleware;
 
 Route::middleware(JwtMiddleware::class)->prefix('admin/menus')->group(function (){
@@ -27,4 +28,8 @@ Route::middleware(JwtMiddleware::class)->prefix('admin/member')->group(function 
     Route::post('/', [AdminMemberController::class, 'index']);
     Route::post('/updateMemberRole', [AdminMemberController::class, 'updateMemberRole']);
     Route::post('/deleteMember', [AdminMemberController::class, 'deleteMember']);
+});
+
+Route::middleware(JwtMiddleware::class)->prefix('admin/permission')->group(function (){
+    Route::get('/', [AdminPermissionController::class, 'index']);
 });
