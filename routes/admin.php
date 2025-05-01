@@ -32,4 +32,5 @@ Route::middleware(JwtMiddleware::class)->prefix('admin/member')->group(function 
 
 Route::middleware(JwtMiddleware::class)->prefix('admin/permission')->group(function (){
     Route::get('/', [AdminPermissionController::class, 'index']);
+    Route::post('/updateMenuRole',[AdminPermissionController::class, 'update'] );
 });

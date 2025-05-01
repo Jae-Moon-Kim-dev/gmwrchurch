@@ -20,8 +20,7 @@ class AdminPermissionController extends Controller
         $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel_'. date("Y-m-d") .'.log')));
     }
 
-    public function index()
-    {
+    public function index() {
         $this->logger->info('===index===');
         $menus = $this->adminPermissionService->getMenuRoleList();
 
@@ -31,5 +30,11 @@ class AdminPermissionController extends Controller
             return response()->json(['success'=>true, 'data'=>$menus], 200);
         }
 
+    }
+
+    public function update(Request $request) {
+        $this->logger->info('===update===');
+
+        $this->adminPermissionService->updateMenuRole($request);
     }
 }

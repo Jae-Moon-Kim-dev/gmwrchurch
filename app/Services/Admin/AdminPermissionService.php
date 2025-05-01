@@ -30,11 +30,12 @@ class AdminPermissionService {
     }
 
     private function getMenuRoles($menuRoles) {
+        $this->logger->info('===getMenuRoles===');
         $menuRoleList = [];
         foreach ( $menuRoles as $menuRole ) {
-            $roleYn = ((!isEmpty($menuRole->read_yn) && $menuRole->read_yn == 'Y')
-                        && (!isEmpty($menuRole->write_yn) && $menuRole->write_yn == 'Y')
-                        && (!isEmpty($menuRole->admin_yn) && $menuRole->admin_yn == 'Y')) ? 'N' : 'Y';
+            $roleYn = ((!empty($menuRole->read_yn) && ($menuRole->read_yn == 'Y'))
+                        || (!empty($menuRole->write_yn) && ($menuRole->write_yn == 'Y'))
+                        || (!empty($menuRole->admin_yn) && ($menuRole->admin_yn == 'Y'))) ? 'N' : 'Y';
             if ( $menuRole->role_id == 3 ) {
                 $menuRole = array(
                     'parent_menu_id'=> $menuRole->parent_menu_id,
@@ -70,5 +71,20 @@ class AdminPermissionService {
         }
 
         return $menuRoleList;
+    }
+
+    public function updateMenuRole ( $request ) {
+        $this->logger->info('===updateMenuRole===');
+        $menuRoles = $request->get('menuRoles');
+
+        foreach( $menuRoles as $menuRole ){
+            $chkMenuRole = $this->adminPermissionRepository->getMenuRole(((object)$menuRole)->menu_id, ((object)$menuRole)->role_id);
+
+            if ( !empty($chkMenuRole) && count($chkMenuRole) > 0 ) {
+                $this->adminPermissionRepository->updateMenuRole((object)$menuRole);
+            } else {
+                $this->adminPermissionRepository->insertMenuRole((object)$menuRole);
+            }
+        }
     }
 }
