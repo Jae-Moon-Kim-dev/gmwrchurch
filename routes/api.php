@@ -14,9 +14,9 @@ Route::middleware([JWTMiddleware::class])->group(function (){;
     Route::post('v1/user',[AuthController::class, 'getUser']);
     Route::post('v1/logout',[AuthController::class, 'logout']);
 });
-Route::middleware('guest')->group(function (){
-    Route::get('board/all', [BoardController::class, 'boardAll']);
-});
+Route::get('menus', [AuthController::class, 'getMenus']);
+Route::get('menu/{id}', [AuthController::class, 'getMenu']);
+Route::get('board/all', [BoardController::class, 'boardAll']);
 
 require __DIR__.'/admin.php';
 require __DIR__.'/common.php';

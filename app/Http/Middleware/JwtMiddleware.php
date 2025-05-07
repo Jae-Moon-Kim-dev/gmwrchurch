@@ -23,10 +23,16 @@ class JwtMiddleware
             'api/v1/register',
             'api/v1/refreshToken',
             'api/v1/idCheck',
+            'api/menus',
+            'api/menu',
         ];
     
-        if (in_array($request->path(), $except)) {
-            return $next($request);
+        foreach ( $except as $ex ) {
+            $exp = "/".preg_quote($ex, "/")."/i";
+            $path = $request->path();
+            if ( preg_match_all($exp, $path) ) {
+                return $next($request);
+            }
         }
 
         try {

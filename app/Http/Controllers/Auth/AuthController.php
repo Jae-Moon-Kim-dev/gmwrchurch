@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
+use App\Services\Admin\AdminMenuService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Services\Auth\AuthService;
@@ -18,18 +19,18 @@ use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller {
     protected $authService;
+    protected $adminMenuService;
     protected $logger;
 
-    public function __construct(AuthService $authService)
-    {
+    public function __construct(AuthService $authService, AdminMenuService $adminMenuService) {
         $this->authService = $authService;
+        $this->adminMenuService = $adminMenuService;
 
         $this->logger = new Logger(__CLASS__);
         $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel_'. date("Y-m-d") .'.log')));
     }
 
-    public function register(LoginRequest $request)
-    {
+    public function register(LoginRequest $request) {
         // $this->validate($request, [
         //     'name' => 'required|min:4',
         //     'email' => 'required|email',
@@ -57,8 +58,7 @@ class AuthController extends Controller {
         return response()->json(['success'=> true, 'message'=> '사용자 등록 완료'], 201);
     }
 
-    public function login(Request $request)
-    {
+    public function login(Request $request) {
         $secure = app()->environment('production');
 
         try {
@@ -94,8 +94,7 @@ class AuthController extends Controller {
         }
     }
 
-    public function refresh(Request $request)
-    {
+    public function refresh(Request $request) {
         $secure = app()->environment('production');
 
         $refreshToken = $request->cookie('gmwr_refreshToken');
@@ -124,8 +123,7 @@ class AuthController extends Controller {
         }
     }
 
-    public function getUser(Request $request)
-    {
+    public function getUser(Request $request) {
         try {
             $user = $request->get("auth_user");
 
@@ -140,8 +138,7 @@ class AuthController extends Controller {
         return response()->json(['success'=>true,'data'=>$user]);
     }
 
-    public function idCheck(Request $request) 
-    {
+    public function idCheck(Request $request) {
         $user = User::where('mem_id', $request->mem_id)->first();
 
         if ( !$user ) {
@@ -159,5 +156,32 @@ class AuthController extends Controller {
                                                                                                  ->cookie('gmwr_refreshToken', '', -1);
     }
 
+    public function getMenus() {
+        $this->logger->info('===getMenus===');
+
+        $menus = $this->authService->getMenus();
+
+        $menuList = $this->authService->getRecursiveMenu($menus);
+
+        if ( !$menuList ) {
+            return response()->json(['success'=>true, 'data'=>null, 'message'=>'No Data'], 200);
+        } else {
+            return response()->json(['success'=>true, 'data'=>$menuList, 'message'=>''], 200);
+        }
+    }
+
+    public function getMenu(string $id) {
+        $this->logger->info('===getMenu===');
+
+        $menu = $this->authService->getMenu($id);
+
+        $menuList = $this->authService->getRecursiveSideMenu((object)$menu);
+
+        if ( !$menuList ) {
+            return response()->json(['success'=>true, 'data'=>null, 'message'=>'No Data'], 200);
+        } else {
+            return response()->json(['success'=>true, 'data'=>$menuList, 'message'=>''], 200);
+        }
+    }
 
 }

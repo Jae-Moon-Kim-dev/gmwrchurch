@@ -62,7 +62,7 @@ class AdminMenuService {
         $this->adminMenuRepository->destroy($id);
     }
 
-    private function getRecursiveMenu($menus) {
+    public function getRecursiveMenu($menus) {
         $this->logger->info('===getRecursiveMenu Start===');
         $tempMenus = [];
         foreach ( $menus as $menu ) {
