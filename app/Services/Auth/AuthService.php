@@ -5,7 +5,6 @@ namespace App\Services\Auth;
 use App\Repositories\Auth\AuthRepository;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use stdClass;
 
 class AuthService {
     protected $authRepository;

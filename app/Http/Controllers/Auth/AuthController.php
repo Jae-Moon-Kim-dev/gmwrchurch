@@ -15,7 +15,6 @@ use Monolog\Handler\StreamHandler;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
-use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller {
     protected $authService;
