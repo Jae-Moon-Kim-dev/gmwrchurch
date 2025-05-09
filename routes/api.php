@@ -20,3 +20,4 @@ Route::get('board/all', [BoardController::class, 'boardAll']);
 
 require __DIR__.'/admin.php';
 require __DIR__.'/common.php';
+require __DIR__.'/file.php';
