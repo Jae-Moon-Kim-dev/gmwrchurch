@@ -105,6 +105,7 @@ class AdminMenuRepository {
         DB::insert('
             insert into wr_menu (
                 parent_menu_id,
+                menu_type,
                 menu_name,
                 menu_url,
                 visible_yn,
@@ -114,6 +115,7 @@ class AdminMenuRepository {
                 modified_date
             ) values (
                 :parent_menu_id,
+                :menu_type,
                 :menu_name,
                 :menu_url,
                 :visible_yn,
@@ -126,6 +128,7 @@ class AdminMenuRepository {
             )
         ', [
             "parent_menu_id"=> ( empty($menu->get('parent_menu_id')) ? null : $menu->get('parent_menu_id') ),
+            "menu_type"=> $menu->get('menu_type'),
             "menu_name"=> $menu->get('menu_name'),
             "menu_url"=> $menu->get('menu_url'),
             "visible_yn"=> $menu->get('visible_yn'),
@@ -136,10 +139,18 @@ class AdminMenuRepository {
     public function update( $request, $id ) {
         DB::update('
             update wr_menu set
+                menu_type= :menu_type,
                 menu_name= :menu_name,
-                menu_url= :menu_url
+                menu_url= :menu_url,
+                visible_yn= :visible_yn
             where menu_id = :menu_id
-        ', ["menu_name"=> $request->input('menu_name'), "menu_url"=> $request->input('menu_url'), "menu_id"=> $id]);
+        ', [
+            "menu_type"=> $request->input('menu_type'),
+            "menu_name"=> $request->input('menu_name'),
+            "menu_url"=> $request->input('menu_url'),
+            "visible_yn"=> $request->input('visible_yn'),
+            "menu_id"=> $id
+            ]);
 
     }
     public function updateOrder( $id, $menuOrder ) {
