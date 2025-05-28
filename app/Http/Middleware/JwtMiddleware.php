@@ -25,6 +25,7 @@ class JwtMiddleware
             'api/v1/idCheck',
             'api/menus',
             'api/menu',
+            'storage',
         ];
     
         foreach ( $except as $ex ) {

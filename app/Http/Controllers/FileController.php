@@ -22,13 +22,12 @@ class FileController extends Controller
      
     public function upload (FormRequest $request) {
         $this->logger->info("===upload===");
-        $this->fileService->upload($request);
-        $file = new stdClass();
+        $url = $this->fileService->upload($request);
 
-        if ( !$file ) {
+        if ( !$url ) {
             return response()->json(['success'=>false, 'message'=>'No Data'], 401);
         } else {
-            return response()->json(['success'=>true, 'data'=>$file], 200);
+            return response()->json(['success'=>true, 'data'=>$url], 200);
         }
     }
 }
