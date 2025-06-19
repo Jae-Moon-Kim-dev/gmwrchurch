@@ -25,13 +25,12 @@ class JwtMiddleware
             'api/v1/idCheck',
             'api/menus',
             'api/menu',
+            'api/board/getPage/*',
             'storage',
         ];
-    
+
         foreach ( $except as $ex ) {
-            $exp = "/".preg_quote($ex, "/")."/i";
-            $path = $request->path();
-            if ( preg_match_all($exp, $path) ) {
+            if ( $request->is($ex) ) {
                 return $next($request);
             }
         }

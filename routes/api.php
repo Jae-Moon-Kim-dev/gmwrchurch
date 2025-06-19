@@ -16,8 +16,8 @@ Route::middleware([JWTMiddleware::class])->group(function (){;
 });
 Route::get('menus', [AuthController::class, 'getMenus']);
 Route::get('menu/{id}', [AuthController::class, 'getMenu']);
-Route::get('board/all', [BoardController::class, 'boardAll']);
 
 require __DIR__.'/admin.php';
 require __DIR__.'/common.php';
 require __DIR__.'/file.php';
+require __DIR__.'/board.php';

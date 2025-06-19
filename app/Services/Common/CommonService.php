@@ -14,7 +14,7 @@ class CommonService {
         $this->commonRepository = $commonRepository;
 
         $this->logger = new Logger(__CLASS__);
-        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel.log'), Logger::INFO));
+        $this->logger->pushHandler(new StreamHandler(storage_path('logs/laravel_'. date("Y-m-d") .'.log')));
     }
 
     public function getMenuType() {
@@ -67,5 +67,5 @@ class CommonService {
 
         return $roles;
     }
-    
+
 }

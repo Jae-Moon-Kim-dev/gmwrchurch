@@ -55,7 +55,7 @@ class FileService {
                 $this->fileRepository->storeFile($files, $uploadDir, $fileName, $request->input('type'));
                 return Storage::url($uploadDir.'/'.$fileName);
             }
-            
+
         }
 
     }
