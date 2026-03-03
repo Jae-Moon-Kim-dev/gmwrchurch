@@ -17,12 +17,12 @@ class FileRepository {
 
     public function getMenuType() {
         $this->logger->info('===getMenuType===');
-        
+
         $menuType = DB::select(
             '
                 select meta_type
                     , meta_key
-                    , meta_value 
+                    , meta_value
                 from wr_meta
                 where meta_type = "menu_type";
             '
@@ -31,45 +31,29 @@ class FileRepository {
         return $menuType;
     }
 
-    public function storeFile($file, $uploadDir, $fileName, $category) {
+    public function storeFile($file, $uploadDir, $fileName, $category, $boardId) {
         $this->logger->info('===storeFile===');
 
-        DB::insert(
-            '
-                insert into wr_file (
-                    category,
-                    directory, 
-                    physical_name, 
-                    actual_name, 
-                    description, 
-                    type, 
-                    size, 
-                    mem_id, 
-                    create_date, 
-                    modified_date
-                ) values (
-                    :category,
-                    :directory,
-                    :physical_name,
-                    :actual_name,
-                    :description,
-                    :type,
-                    :size,
-                    :mem_id,
-                    now(),
-                    now()
-                );
-            ',
-            [
-                'category' => $category,
-                'directory' => $uploadDir,
-                'physical_name' => $fileName,
-                'actual_name' => $file->getClientOriginalName(),
-                'description' => $file->getClientOriginalName(),
-                'type' => $file->getClientMimeType(),
-                'size' => $file->getSize(),
-                'mem_id' => Auth::user()->id
-            ]
-        );
+        $inputData = [
+            'category' => $category,
+            'directory' => $uploadDir,
+            'physical_name' => $fileName,
+            'actual_name' => $file->getClientOriginalName(),
+            'description' => $file->getClientOriginalName(),
+            'type' => $file->getClientMimeType(),
+            'size' => $file->getSize(),
+            'mem_id' => Auth::user()->id,
+            'create_date' => now(),
+            'modified_date' => now()
+        ];
+
+        if ( !empty($boardId) )
+        {
+            $inputData['board_id'] = $boardId;
+        }
+
+        $fileId = DB::table('wr_file')->insertGetId($inputData);
+
+        $this->logger->info('===storeFile===end_file_id: '.$fileId);
     }
 }

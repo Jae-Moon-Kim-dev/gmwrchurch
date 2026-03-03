@@ -24,8 +24,9 @@ class JwtMiddleware
             'api/v1/refreshToken',
             'api/v1/idCheck',
             'api/menus',
-            'api/menu',
+            'api/menu/*',
             'api/board/getPage/*',
+            'api/board/getRoleByUser',
             'storage',
         ];
 

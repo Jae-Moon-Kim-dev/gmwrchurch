@@ -44,7 +44,7 @@ class FileService {
                     $fileName = $this->RandomName($idx);
                     Storage::disk('public')->putFileAs($uploadDir, $file, $fileName);
                     // $file->storeAs('public/'.$uploadDir, $fileName);
-                    $this->fileRepository->storeFile($file, $uploadDir, $fileName, $request->input('type'));
+                    $this->fileRepository->storeFile($file, $uploadDir, $fileName, $request->input('type'), null);
                     $idx++;
                     return Storage::url($uploadDir.'/'.$fileName);
                 }
@@ -52,7 +52,7 @@ class FileService {
                 $fileName = $this->RandomName($idx);
                 Storage::disk('public')->putFileAs($uploadDir, $files, $fileName);
                 // $file->storeAs('public/'.$uploadDir, $fileName);
-                $this->fileRepository->storeFile($files, $uploadDir, $fileName, $request->input('type'));
+                $this->fileRepository->storeFile($files, $uploadDir, $fileName, $request->input('type'), null);
                 return Storage::url($uploadDir.'/'.$fileName);
             }
 
